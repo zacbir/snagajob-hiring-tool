@@ -22,7 +22,7 @@ if __name__ == '__main__':
         with open(os.path.join(args.applications_directory, application_filename), 'r') as appl_json:
             application = json.load(appl_json)
 
-        if questionnaire.validate(application):
+        if questionnaire.review_for_acceptability(application):
             acceptable += 1
             print "{} has submitted an acceptable application.".format(application['name'])
         else:

@@ -87,6 +87,14 @@ INVALID_APPLICATION = dict(
     name="invalid",
     questions=[
         dict(
+            question="2",
+            answer="2.1")
+    ])
+
+UNACCEPTABLE_APPLICATION = dict(
+    name="invalid",
+    questions=[
+        dict(
             question="1",
             answer="1.2"),
         dict(
@@ -94,7 +102,7 @@ INVALID_APPLICATION = dict(
             answer="2.1")
     ])
 
-VALID_APPLICATION = dict(
+ACCEPTABLE_APPLICATION = dict(
     name="invalid",
     questions=[
         dict(
@@ -126,10 +134,19 @@ class QuestionnaireTests(unittest.TestCase):
         questionnaire = Questionnaire.from_dict(VALID_QUESTIONNAIRE)
         self.assertEqual(len(questionnaire.questions), 2, "Doesn't have two questions")
 
-    def test_application_invalidity(self):
-        questionnaire = Questionnaire.from_dict(VALID_QUESTIONNAIRE)
-        self.assertFalse(questionnaire.validate(INVALID_APPLICATION), "Questionnaire improperly validates")
-
     def test_application_validity(self):
         questionnaire = Questionnaire.from_dict(VALID_QUESTIONNAIRE)
-        self.assertTrue(questionnaire.validate(VALID_APPLICATION), "Questionnaire improperly validates")
+        self.assertFalse(questionnaire.review_for_validity(INVALID_APPLICATION), "Questionnaire improperly validates")
+        
+    def test_application_unacceptability(self):
+        questionnaire = Questionnaire.from_dict(VALID_QUESTIONNAIRE)
+        self.assertFalse(questionnaire.review_for_acceptability(UNACCEPTABLE_APPLICATION), "Questionnaire improperly judges unacceptability")
+
+    def test_application_acceptability(self):
+        questionnaire = Questionnaire.from_dict(VALID_QUESTIONNAIRE)
+        self.assertTrue(questionnaire.review_for_acceptability(ACCEPTABLE_APPLICATION), "Questionnaire improperly judges acceptability")
+
+    def test_questionnaire_lookup(self):
+        questionnaire = Questionnaire.from_dict(VALID_QUESTIONNAIRE)
+        q1 = questionnaire.questions[0]
+        self.assertEqual(questionnaire.get('1'), q1, "Question lookup by key not working")

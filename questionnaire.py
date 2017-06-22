@@ -11,10 +11,11 @@ class Answer:
 
 class Question:
 
-    def __init__(self, id, question, answers):
+    def __init__(self, id, question, answers, optional=False):
         self.id = id
         self.question = question
         self.answers = answers
+        self.optional = optional
 
     def valid(self):
         """ There must be one acceptable answer for the Question to be acceptable. """
@@ -25,7 +26,9 @@ class Question:
             if a.id == key:
                 return a
         return default
-    
+
+    get = __getitem__
+
 
 class Questionnaire:
 
@@ -44,7 +47,7 @@ class Questionnaire:
         questionnaire = cls(q_dict['id'], q_dict['title'], [])
         
         for q in q_dict['questions']:
-            question = Question(q['id'], q['question'], [])
+            question = Question(q['id'], q['question'], [], q.get('optional', False))
             for a in q['answers']:
                 answer = Answer(a['id'], a['answer'], a['acceptable'])
                 question.answers.append(answer)
@@ -66,17 +69,33 @@ class Questionnaire:
             if q.id == key:
                 return q
         return default
+
+    get = __getitem__
     
-    def validate(self, application):
-        """ Evaluation an application for acceptance. All answers must be acceptable. """
-        acceptable = True
-        
+    def review_for_validity(self, application):
+        """ Evaluate an application for validity. All required answers must be present. """
+        necessary = set([q for q in self.questions if not q.optional])
+
         for q in application['questions']:
-            question = self[q['question']]
+            question = self.get(q['question'])
             if question:
-                answer = question[q['answer']]
-            if not answer.acceptable:
-                acceptable = False
-                break
+                necessary.remove(question)
+
+        return len(necessary) == 0
+        
+    def review_for_acceptability(self, application):
+        """ Evaluate an application for acceptabillity. All required answers must be acceptable. """
+        acceptable = True
+
+        if self.review_for_validity(application):
+            for q in application['questions']:
+                question = self.get(q['question'])
+                if question:
+                    answer = question.get(q['answer'])
+                    if answer and not answer.acceptable:
+                        acceptable = False
+                        break
+        else:
+            acceptable = False
 
         return acceptable
