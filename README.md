@@ -5,8 +5,8 @@
 ### questionnaire.json
 
 A sample Questionnaire, represented in JSON. Has an internal id, a
-position title, and a series of questions, with answers, at least of
-one which is an acceptable answer.
+position title, and a series of questions, with answers, at least one
+of which is an acceptable answer.
 
 ### questionnaire.py
 
@@ -19,7 +19,9 @@ acceptability.
 
 #### Question
 
-Has an id, a textual element, and a list of Answers.
+Has an id, a textual element, a list of Answers, and a boolean
+designating the question as optional, defaulting to False (i.e.,
+required by default).
 
 A Question is valid so long as any of its Answers are acceptable.
 
@@ -32,7 +34,7 @@ valid.
 
 A Questionnaire can review an application of question/answer pairs for
 both validity (all required questions are answered) and for
-acceptability (all required questions are answered with accetable
+acceptability (all required questions are answered with acceptable
 answers).
 
 ## Scripts
@@ -87,12 +89,12 @@ optional arguments:
 ### test_questions.py
 
 Tests Question behavior. In particular, whether a given Question is
-valid.
+valid, and whether answer lookup by id works as intended.
 
 ### test_questionnaires.py
 
-Tests Questionnaire behavior. Tests both valid Questionnaires, and
-acceptable applications.
+Tests Questionnaire behavior. Tests Questionnaire validation and
+question lookup by id, and vetting applications for acceptability.
 
 ## Sample Applications
 
